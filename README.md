@@ -17,7 +17,7 @@ The lab will compare Poisson and Dixon–Coles score models, build transparent m
 
 - [x] Repository initialized.
 - [x] Python package and automated test workflow scaffolded.
-- [ ] Dataset validation: awaiting first CI run and review.
+- [x] Dataset schema validation and national-team eligibility filters (CI passed).
 - [ ] Historical club dataset ingestion.
 - [ ] Senior national-team A-international dataset ingestion.
 - [ ] Poisson attack/defence maximum-likelihood estimation.
@@ -59,7 +59,7 @@ For national-team records, `fifa_a_match_status` must be `yes`, `no`, or `unknow
 
 ## Google Colab
 
-Open [notebooks/01_dataset_audit_colab.ipynb](notebooks/01_dataset_audit_colab.ipynb) in Google Colab. The notebook clones this public repository, installs the package, and lets you upload a CSV for validation.
+Open [notebooks/01_dataset_audit_colab.ipynb](notebooks/01_dataset_audit_colab.ipynb) in Google Colab. The notebook clones this public repository, installs the package and test dependencies, and lets you upload a CSV for validation.
 
 ## Data licensing
 

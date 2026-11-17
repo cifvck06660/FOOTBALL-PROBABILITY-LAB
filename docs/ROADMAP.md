@@ -4,7 +4,7 @@ A stage is complete only when its acceptance criteria are met, tests pass, and t
 
 ## Stage 1 — Data foundation
 - [x] Initialize repository, package layout, and CI test workflow.
-- [ ] Validate canonical match CSV schema and row integrity (first CI run pending).
+- [x] Validate canonical match CSV schema and row integrity (GitHub Actions passed on 2026-11-17).
 - [ ] Add source/license/retrieval metadata manifest.
 - [ ] Ingest a licensed historical club dataset.
 - [ ] Ingest verified senior men's national-team A internationals.
