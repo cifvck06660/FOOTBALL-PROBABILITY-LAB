@@ -77,6 +77,7 @@ def _canonical_frame(
     team_level: str,
     gender: str | None,
     competition_column: str,
+    competition_type_column: str | None = None,
     home_score_column: str,
     away_score_column: str,
     neutral_column: str | None,
@@ -94,7 +95,8 @@ def _canonical_frame(
     result["competition"] = frame[competition_column].astype("string").str.strip()
     result["match_type"] = match_type
     result["team_level"] = team_level
-    result["competition_type"] = frame[competition_column].map(competition_type_fn)
+    type_values = frame[competition_type_column] if competition_type_column else frame[competition_column]
+    result["competition_type"] = type_values.map(competition_type_fn)
     result["score_basis"] = score_basis
     result["model_eligible_90m"] = model_eligible_90m
     result["data_source"] = source_name
@@ -163,18 +165,19 @@ def normalize_club_results(
         team_level="senior",
         gender=None,
         competition_column="competition",
+        competition_type_column="level",
         home_score_column="gh",
         away_score_column="ga",
         neutral_column=None,
-        competition_type_fn=lambda _: "other",
+        competition_type_fn=lambda value: (
+            "league" if str(value).strip().casefold() == "national"
+            else "club_international_cup" if str(value).strip().casefold() == "international"
+            else "other"
+        ),
         score_basis="regulation_90",
         model_eligible_90m=True,
         fifa_status=None,
     )
-    # Preserve the source's distinction between domestic leagues and club cups.
-    normalized["competition_type"] = frame.loc[
-        normalized.index, "level"
-    ].map(club_type).fillna("other").to_numpy()
     return normalized
 
 
@@ -362,6 +365,10 @@ def run_ingestion(since: str, until: str) -> dict:
         registry = pd.read_csv(REGISTRY_PATH)
     outputs["men"] = apply_fifa_a_registry(outputs["men"], registry)
     outputs["women"] = apply_fifa_a_registry(outputs["women"], registry)
+    for key in ("men", "women"):
+        source_log[key]["fifa_a_verified_rows"] = int(
+            outputs[key]["fifa_a_match_status"].astype("string").eq("yes").sum()
+        )
 
     filenames = {
         "club": "club_matches_10y.csv",
