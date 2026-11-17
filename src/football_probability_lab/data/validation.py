@@ -30,9 +30,8 @@ class ValidationReport:
 def validate_matches(frame: pd.DataFrame) -> ValidationReport:
     """Validate the canonical match table without modifying the input.
 
-    Row-level issues are reported with counts. This function checks structure
-    and basic data integrity; it does not certify a source's historical accuracy
-    or FIFA A-international status.
+    This checks structure and basic integrity. It does not certify a source's
+    historical accuracy or FIFA A-international status.
     """
     if not isinstance(frame, pd.DataFrame):
         raise TypeError("frame must be a pandas DataFrame")
@@ -52,7 +51,6 @@ def validate_matches(frame: pd.DataFrame) -> ValidationReport:
 
     bad_rows = pd.Series(False, index=frame.index)
 
-    # Required text fields must be present and non-blank.
     text_columns = (
         "match_id",
         "home_team",
@@ -140,6 +138,47 @@ def validate_matches(frame: pd.DataFrame) -> ValidationReport:
                 "FIFA A-international status."
             )
 
+    if "model_eligible_90m" in frame.columns:
+        eligible = (
+            frame["model_eligible_90m"]
+            .astype("string")
+            .str.strip()
+            .str.casefold()
+            .eq("true")
+        )
+        if "score_basis" in frame.columns:
+            wrong_score_basis = eligible & ~frame["score_basis"].astype(
+                "string"
+            ).str.strip().str.casefold().eq("regulation_90")
+            if wrong_score_basis.any():
+                count = int(wrong_score_basis.sum())
+                errors.append(
+                    f"model_eligible_90m: {count} row(s) are marked eligible "
+                    "without regulation_90 score basis."
+                )
+                bad_rows |= wrong_score_basis
+        if "fifa_a_match_status" in frame.columns:
+            national = (
+                frame["match_type"].astype("string").str.strip().str.casefold()
+                == "national_team"
+            )
+            unverified_eligible = (
+                eligible
+                & national
+                & ~frame["fifa_a_match_status"]
+                .astype("string")
+                .str.strip()
+                .str.casefold()
+                .eq("yes")
+            )
+            if unverified_eligible.any():
+                count = int(unverified_eligible.sum())
+                errors.append(
+                    f"model_eligible_90m: {count} unverified national-team "
+                    "row(s) are marked eligible."
+                )
+                bad_rows |= unverified_eligible
+
     valid_rows = int((~bad_rows).sum())
     if valid_rows < total:
         warnings.append(
@@ -152,12 +191,7 @@ def validate_matches(frame: pd.DataFrame) -> ValidationReport:
 def national_team_eligible_matches(
     frame: pd.DataFrame, *, include_friendlies: bool = True
 ) -> pd.DataFrame:
-    """Return verified senior national-team A internationals only.
-
-    Friendlies are included by default but remain explicitly labeled. Set
-    include_friendlies=False to retain competitive matches only. Men's and
-    women's records remain separate in the returned data via the gender field.
-    """
+    """Return verified senior national-team A internationals only."""
     required = {
         "match_type",
         "team_level",
@@ -184,3 +218,26 @@ def national_team_eligible_matches(
         mask &= normalized["competition_type"].ne("friendly")
 
     return frame.loc[mask.fillna(False)].copy()
+
+
+def model_eligible_90m_matches(frame: pd.DataFrame) -> pd.DataFrame:
+    """Return only rows explicitly cleared for regulation-time goal modeling."""
+    if "model_eligible_90m" not in frame.columns or "score_basis" not in frame.columns:
+        raise ValueError(
+            "model_eligible_90m and score_basis columns are required."
+        )
+    eligible = (
+        frame["model_eligible_90m"]
+        .astype("string")
+        .str.strip()
+        .str.casefold()
+        .eq("true")
+    )
+    regulation = (
+        frame["score_basis"]
+        .astype("string")
+        .str.strip()
+        .str.casefold()
+        .eq("regulation_90")
+    )
+    return frame.loc[(eligible & regulation).fillna(False)].copy()

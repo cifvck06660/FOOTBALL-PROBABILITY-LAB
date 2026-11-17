@@ -19,6 +19,7 @@ ALLOWED_VALUES = {
     "competition_type": {
         "league",
         "cup",
+        "club_international_cup",
         "qualification",
         "friendly",
         "nations_league",
@@ -26,6 +27,11 @@ ALLOWED_VALUES = {
     },
     "gender": {"men", "women", "mixed", "unknown"},
     "fifa_a_match_status": {"yes", "no", "unknown"},
+    "score_basis": {
+        "regulation_90",
+        "full_time_extra_time_included",
+        "unknown",
+    },
 }
 
 OPTIONAL_COLUMNS = (
@@ -33,6 +39,8 @@ OPTIONAL_COLUMNS = (
     "gender",
     "neutral_venue",
     "fifa_a_match_status",
+    "score_basis",
+    "model_eligible_90m",
     "data_source",
     "source_match_id",
 )

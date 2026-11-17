@@ -1,16 +1,18 @@
 # Development roadmap
 
-A stage is complete only when its acceptance criteria are met, tests pass, and the method is documented. Do not mark work green based on file creation alone.
+A stage is complete only when its acceptance criteria are met, tests pass, and the method is documented. Download code being present does not mean that data ingestion has been run or that source records have been verified.
 
 ## Stage 1 — Data foundation
 - [x] Initialize repository, package layout, and CI test workflow.
-- [x] Validate canonical match CSV schema and row integrity (GitHub Actions passed on 2026-11-17).
-- [ ] Add source/license/retrieval metadata manifest.
-- [ ] Ingest a licensed historical club dataset.
-- [ ] Ingest verified senior men's national-team A internationals.
-- [ ] Ingest verified senior women's national-team A internationals.
-- [ ] Keep friendly and competitive fixtures separately filterable.
-- [ ] Add deduplication and team-name mapping review.
+- [x] Validate canonical match CSV schema and row integrity (GitHub Actions passed).
+- [x] Record source repositories, stated licenses, coverage, and limitations.
+- [x] Add reproducible download and normalization adapters for club, men's international, and women's international datasets.
+- [x] Keep friendly and competitive national-team records separately labeled.
+- [ ] Run the download pipeline in Google Colab and inspect the generated manifest.
+- [ ] Verify senior men's FIFA A-international rows against the FIFA archive.
+- [ ] Verify senior women's FIFA A-international rows against the FIFA archive.
+- [ ] Obtain regulation-time scores for national-team records before 90-minute goal modeling.
+- [ ] Review duplicates, team aliases, and competition mappings.
 
 ## Stage 2 — Baseline models
 - [ ] Poisson attack/defence model with home advantage, fitted by maximum likelihood.

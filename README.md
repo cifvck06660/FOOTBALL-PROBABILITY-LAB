@@ -2,11 +2,11 @@
 
 Open, reproducible football analytics research using Python and Google Colab.
 
-The lab will compare Poisson and Dixon–Coles score models, build transparent match probabilities, and evaluate them with chronological out-of-sample tests. It covers club football and senior national-team A internationals, with men's and women's competitions kept separate.
+The lab compares Poisson and Dixon–Coles score models, builds transparent match probabilities, and evaluates them with chronological out-of-sample tests. It covers club football and senior national-team A internationals, with men's and women's competitions kept separate.
 
 ## Research principles
 
-- Evidence first: every dataset must record its source, retrieval date, license, and transformations.
+- Evidence first: every dataset records its source, stated license, retrieval time, and transformations.
 - No data leakage: a prediction may only use information available before its match.
 - Reproducibility: notebooks, parameters, code versions, and evaluation windows are recorded.
 - Separate populations: club, men's national teams, and women's national teams are modeled and evaluated separately.
@@ -15,56 +15,43 @@ The lab will compare Poisson and Dixon–Coles score models, build transparent m
 
 ## Project status
 
-- [x] Repository initialized.
-- [x] Python package and automated test workflow scaffolded.
-- [x] Dataset schema validation and national-team eligibility filters (CI passed).
-- [ ] Historical club dataset ingestion.
-- [ ] Senior national-team A-international dataset ingestion.
-- [ ] Poisson attack/defence maximum-likelihood estimation.
-- [ ] Dixon–Coles rho estimation.
+- [x] Repository initialized and Python CI tests passing.
+- [x] Canonical match validation and national-team eligibility filters.
+- [x] Source registry with license and coverage notes.
+- [x] Reproducible download and normalization pipeline.
+- [ ] Run ingestion and inspect the downloaded data manifest in Colab.
+- [ ] Verify FIFA A-international status and regulation-time scores.
+- [ ] Poisson and Dixon–Coles models.
 - [ ] Walk-forward evaluation and calibration.
-- [ ] Odds normalization, EV, Kelly, ROI and P/L evaluation.
+- [ ] Odds normalization, EV, Kelly, ROI and P/L.
 - [ ] Live-match state model.
 
-A feature is marked complete only after its tests pass and its methodology is documented.
+A feature is marked complete only after its tests pass and its methodology is documented. Dataset ingestion is not considered complete until the generated manifest and row-level audit have been reviewed.
 
 ## Quick start
 
 Python 3.10+ is recommended.
 
-```bash
-python -m venv .venv
-source .venv/bin/activate  # Windows: .venv\\Scripts\\activate
-pip install -e ".[dev]"
-pytest
-```
+    python -m venv .venv
+    source .venv/bin/activate
+    pip install -e ".[dev]"
+    pytest
 
 ## Dataset format
 
-See [docs/DATA_DICTIONARY.md](docs/DATA_DICTIONARY.md) and [data/templates/matches_template.csv](data/templates/matches_template.csv).
+See docs/DATA_DICTIONARY.md and docs/DATA_SOURCES.md. The canonical template is data/templates/matches_template.csv.
 
-Required fields:
-
-`match_id,date,home_team,away_team,home_goals,away_goals,competition,match_type,team_level,competition_type`
-
-For national-team records, `fifa_a_match_status` must be `yes`, `no`, or `unknown`. Only verified senior A internationals are eligible for the A-international dataset. Unknown status is not silently treated as eligible.
-
-### National-team scope
-
-- Senior men's and senior women's teams are stored and analyzed separately.
-- Include only first teams representing national associations; exclude U-23, U-20, U-17, B teams, and league selections.
-- Store FIFA A-international recognition explicitly as evidence-backed metadata.
-- Keep friendlies separately labeled from competitive fixtures. The analysis can include or exclude friendlies explicitly.
-- Do not infer FIFA recognition solely from team names or tournament labels.
+National-team FIFA A status must be yes, no, or unknown. Only exact, evidence-backed FIFA archive registry matches are considered verified. Unknown is never treated as yes.
 
 ## Google Colab
 
-Open [notebooks/01_dataset_audit_colab.ipynb](notebooks/01_dataset_audit_colab.ipynb) in Google Colab. The notebook clones this public repository, installs the package and test dependencies, and lets you upload a CSV for validation.
+- Dataset schema audit: notebooks/01_dataset_audit_colab.ipynb
+- Download and normalize sources: notebooks/02_ingest_datasets_colab.ipynb
 
 ## Data licensing
 
-Code licensing and dataset licensing are different. Do not commit third-party raw datasets unless their license permits redistribution. Keep source URLs, license terms, attribution, retrieval date, and transformation notes with each dataset. Raw data is ignored by Git by default.
+Code licensing and dataset licensing are different. Raw and processed data are not committed by default. ODC-BY attribution applies to the club source; men's international data is stated as CC0 1.0; women's international data uses the Unlicense. See docs/DATA_SOURCES.md and each source's own repository before redistribution.
 
 ## Roadmap
 
-See [docs/ROADMAP.md](docs/ROADMAP.md) for staged implementation and acceptance criteria.
+See docs/ROADMAP.md for staged implementation and acceptance criteria.
