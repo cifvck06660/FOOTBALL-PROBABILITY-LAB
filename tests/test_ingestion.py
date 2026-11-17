@@ -17,6 +17,16 @@ def test_club_import_keeps_only_regulation_time_matches():
         [
             {
                 "date": "2020-01-01",
+                "home": "Extra Time Home",
+                "away": "Extra Time Away",
+                "gh": 3,
+                "ga": 2,
+                "competition": "Continental Cup",
+                "full_time": "E",
+                "level": "international",
+            },
+            {
+                "date": "2020-01-02",
                 "home": "Home FC",
                 "away": "Away FC",
                 "gh": 2,
@@ -26,17 +36,17 @@ def test_club_import_keeps_only_regulation_time_matches():
                 "level": "national",
             },
             {
-                "date": "2020-01-02",
+                "date": "2020-01-03",
                 "home": "Cup Home",
                 "away": "Cup Away",
-                "gh": 3,
-                "ga": 2,
+                "gh": 2,
+                "ga": 0,
                 "competition": "Continental Cup",
-                "full_time": "E",
+                "full_time": "F",
                 "level": "international",
             },
             {
-                "date": "2020-01-03",
+                "date": "2020-01-04",
                 "home": "Shootout Home",
                 "away": "Shootout Away",
                 "gh": 5,
@@ -50,10 +60,10 @@ def test_club_import_keeps_only_regulation_time_matches():
     result = normalize_club_results(
         source, since="2020-01-01", until="2020-12-31"
     )
-    assert len(result) == 1
-    assert result.loc[0, "score_basis"] == "regulation_90"
-    assert bool(result.loc[0, "model_eligible_90m"])
-    assert result.loc[0, "competition_type"] == "league"
+    assert len(result) == 2
+    assert result["score_basis"].tolist() == ["regulation_90", "regulation_90"]
+    assert result["model_eligible_90m"].tolist() == [True, True]
+    assert result["competition_type"].tolist() == ["league", "club_international_cup"]
 
 
 def test_mens_source_is_candidate_not_auto_fifa_a_or_90m_eligible():
